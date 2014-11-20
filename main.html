@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- BOOSTRAP -->
+	<script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap-theme.min.css">
+    <!-- END BOOSTRAP -->
+    
+    <!-- JUMBOTRON TEMPLATE -->
+    <link rel="stylesheet" href="/static/css/jumbotron/jumbotron-narrow.css">
+    <!-- END JUMBOTRON TEMPLATE -->
+    
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/_ah/channel/jsapi"></script>
+	<title> Tomathon </title>
+</head>
+<body>
+	
+	<div class="container">
+      <div class="header">
+		        <ul class="nav nav-pills pull-right">
+		          <li class="active"><a href="/">Inicio</a></li>
+		          <li><a href="/juego">Juego Nuevo</a></li>
+		          <li><a href="/leaderboard">Leaderboard</a></li>
+		        </ul>
+		        <h3 class="text-muted">Tomathon</h3>
+		      </div>
+      
+     <img src="../static/images/logoTomathon.png" class="img-rounded" alt="Responsive image">
+      
+     <span id="perdiste"><h1 class="text-center">LEADERBOARD</h1></span> 
+     <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>PLAYER</th>
+          <th>HIGH SCORE</th>
+          <th>TOTAL TOMATOES</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        {% set exists = 0 %}
+        {% for ganador in ganadores %}
+        	<tr>
+        		{% set exists = exists + 1 %}
+	          <td>{{ exists }}</td>
+	          <td>{{ ganador.key.id() }}</td>
+	          <td>{{ ganador.wins }}</td>
+	        </tr>
+		{% endfor %}
+        
+      </tbody>
+    </table> 
+	
+	<div class="footer">
+        <p>Piedra Papel y Tijera</p>
+      </div>
+
+	<script>
+
+	    $(document).ready(function () {
+
+			client_id = '{{client_id}}';
+			channel_key = '{{channel_key}}';
+
+			console.log({
+				'client_id': client_id,
+				'channel_key': channel_key
+			});
+
+			channel = new goog.appengine.Channel(channel_key);
+				socket = channel.open();
+				socket.onopen = function() {
+				console.log('Channel established.');
+			};
+
+			socket.onmessage = function(message) {
+				var data = jQuery.parseJSON(message.data)
+				console.log(data);
+				if(data.key === "new_user"){
+					$("#users_list").append('<li>' + data.data.email + '</li>');
+				}
+
+				//alert(data.data.email)
+			};
+
+			socket.onerror = function(error) {
+				console.log('Channel error: ' + error.description);
+			};
+
+			socket.onclose = function() {
+				console.log('Channel closed.');
+			};
+
+	    });
+  	</script>
+  	</div>
+</body>
+</html>
